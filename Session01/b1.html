@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      ul {
+        list-style-type: none;
+      }
+      li {
+        padding: 10px;
+        border-bottom: 1px solid gray;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .completed {
+        text-decoration: line-through;
+        color: gray;
+      }
+      button {
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Todo List</h1>
+    <form id="todo_form">
+      <input type="text" id="todo_input" placeholder="Add a new task">
+      <button type="submit">Add</button>
+    </form>
+    <ul id="todo_list"></ul>
+    <script>
+      const form = document.getElementById("todo_form");
+      const input = document.getElementById("todo_input");
+      const list = document.getElementById("todo_list");
+
+      let todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+      function renderTodos() {
+        list.innerHTML = "";
+        todos.forEach((todo, index) => {
+          const li = document.createElement("li");
+          li.className = todo.completed ? "completed" : "";
+          li.innerHTML = `
+          <span>${todo.text}</span>
+          <div>
+            <button onclick="toggleComplete(${index})">${todo.completed ? "Undo" : "Done"}</button>
+            <button onclick="deleteTodo(${index})">Delete</button>
+          </div>
+        `;
+          list.appendChild(li);
+        });
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const newTodo = {
+          text: input.value.trim(),
+          completed: false,
+        };
+        if (newTodo.text !== "") {
+          todos.push(newTodo);
+          input.value = "";
+          saveAndRender();
+        }
+      });
+
+      function toggleComplete(index) {
+        todos[index].completed = !todos[index].completed;
+        saveAndRender();
+      }
+
+      function deleteTodo(index) {
+        todos.splice(index, 1);
+        saveAndRender();
+      }
+
+      function saveAndRender() {
+        localStorage.setItem("todos", JSON.stringify(todos));
+        renderTodos();
+      }
+
+      renderTodos();
+    </script>
+  </body>
+</html>
